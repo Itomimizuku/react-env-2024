@@ -1,0 +1,123 @@
+このファイルは本来必要ない
+
+環境構築に必要な追加設定を記述する
+
+/*import alias 追加した部分 importの時に../../のような記述ではなく、＠/でsrc以下を示せるように設定*/
+    "baseUrl": "./",
+    "paths": {
+      "@/*":["src/*"]
+    }
+
+tsconnfig.jsonに上記を追加
+
+//tsconnfigの設定を変更した際にvite.config.tsに変更を適用させるための追加モジュール
+npm i -D vite-tsconfig-paths
+
+export default defineConfig({
+  plugins: [react()],
+})
+
+上記を下記に変更、importを忘れずに
+import tsconfigPaths from "vite-tsconfig-paths";
+
+export default defineConfig({
+  plugins: [react(),tsconfigPaths()],
+})
+
+
+//TEST環境の用意,ライブラリのインポート
+
+npm i -D vitest happy-dom @vitest/coverage-v8 @testing-library/react @testing-library/user-event @testing-library/jest-dom
+
+package.jsonのscriptに下記を追加、coverageとはテストのカバー率を教えてくれるs
+"test": "vitest watch",
+"coverage":"vitest run --coverage"
+
+//jest test関数等のライブラリを毎回インポートしないようにする
+vitetst.setup.tsファイルを作成し、ファイル内にjest-domをインポート
+
+vite.config.tsのファイルにtest:~を追加
+export default defineConfig({
+  plugins: [react(),tsconfigPaths()],
+  test:{
+    globals:true,
+    environment:"happy-dom",
+    setupFiles:["./vitest-setup.ts"],
+  },
+});
+
+TypeScriptエラーが出るので、一番上に
+///<reference types="vitest" />
+と記述し、型エラーを回避
+
+tsconfig.json内のincludeにもセットアップを追加し
+ "include": ["src","vitest-setup.ts"],に変更
+
+ 
+さらに、"paths":{}の下に
+  "types": ["vitest/globals"]
+を追加
+
+//ESlint  構文チェック
+npm i -D eslint
+npx eslint --init　//初期化
+
+質問を終え、インストール完了後、pacage.jsonにコマンドを追加
+"lint":"eslint src" この時、もともと入っているlintコマンドを削除
+ソース内の構文チェックを行う
+
+.eslint.cjs内のルールを変更し、import react ~についてのチェックを外す
+"rules": {
+        "react/react-in-jsx-scope":"off",
+    }
+
+    npm run lint を行うとエラーが起こるので、app.tsx内のaタグにrel='noreferrer'を追加
+
+package.json内のスクリプトに"lint:fix":"eslint src --fix"を追加することで自動修正してくれる
+
+
+//prettier
+拡張機能をインストールするか、npm i -D prettier
+
+カスタマイズするときは、prettier.config.jsonをsrcの外に作成
+
+/**@type {import("prettier").config} */
+
+const config = {
+    semi: true,
+    tabWidth:2,
+    singleQuote:true
+};
+
+
+export default config;
+このように記述。@type~はTypeScript。ほかは自由にカスタマイズ可能
+プラグインで導入している場合はctrl+Shift+Pでsetting.jsonを検索
+ その後、editor.formatOnSaveをtrueに変更
+
+ "format": "prettier . --write"をpackage.jsonのスクリプトに追加
+ .を忘れない。.は現在のプロジェクトの意味
+prettierのルールに従って自動でフォーマットしてくれるコマンド
+
+//husky lint-staged  gitにpushするときに構文チェックしてくれる
+まずgit　init で初期化
+npm i -D lint-staged
+
+npm install --save-dev husky
+npx husky init
+npx husky install
+npx husky add .husky/pre-commit "npx lint-staged"
+
+  "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.6.0"
+  },の下に
+
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}":[
+      "prettier --write",
+      "eslint --fix"
+    ]
+  }
+
+  を追加　"devDependencies":{}の外であることに注意
+
