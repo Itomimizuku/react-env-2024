@@ -141,3 +141,56 @@ settings:{
 ]
 
 `"` can be e～のエラーは””を削除する　今回は今回はargsの部分
+
+
+//tailwindcss ここは好み
+
+
+npm i -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+作成されたtailwind.configに content: ["./index.html","./src/**/*.{js,ts,jsx,tsx}"],を追加
+
+index.cssの中身を削除し、
+@tailwind base;
+@tailwind components;
+@tailwind utilities;と記述
+
+//shadcn
+npx shadcn-ui@latest init
+Where is your global CSS file? ... src/index.css　ここだけ指定
+
+
+rootに.github/workflowsディレクトリを作成
+lint_test.ymlファイルを作成
+
+name: list and Test
+
+on: push
+
+jobs:
+    lint-and-test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: action/checkout@v4
+            
+            - name: Setup Node
+              uses: action/setup-node@v4
+              with:
+                node-version: '20'
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Run Lint
+              run: npm run lint
+
+            - name: Run Test
+              run: npm run test
+
+              を記述
+
+
+tailwind.configのmodule.exports = を export defaultに変更。
+一番下のrequireをimportに変更
