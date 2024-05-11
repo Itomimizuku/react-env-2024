@@ -106,6 +106,7 @@ npm i -D lint-staged
 npm install --save-dev husky
 npx husky init
 npx husky install
+この時,husky/precommitファイルが存在していたら削除してから下記のコマンドを実行する
 npx husky add .husky/pre-commit "npx lint-staged"
 
   "vite-tsconfig-paths": "^4.3.2",
@@ -120,4 +121,23 @@ npx husky add .husky/pre-commit "npx lint-staged"
   }
 
   を追加　"devDependencies":{}の外であることに注意
+  js,jsx...の時空白を開けてはいけない
 
+//story book
+npx storybook init --builder @storybook/builder-vite
+
+
+✖ eslint --fix:
+git commit時にWarning: React version not～のようなエラーがでるようになるので
+.eslint.cjsに下記を追加
+settings:{
+    react:{ version:'detect'},
+  }
+  
+ warning  File ignored by default.  ~のワーニングについて
+ package.jsonに下記を追加
+  "ignorePatterns":[
+    "!.storybook"
+]
+
+`"` can be e～のエラーは””を削除する　今回は今回はargsの部分
